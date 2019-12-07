@@ -30,7 +30,6 @@ public class Server implements Runnable {
         Thread chatThread = new Thread(server);
         chatThread.start();
 
-
     }
 
     @Override
@@ -46,20 +45,59 @@ public class Server implements Runnable {
         }
 
         // Receive username
+        try {
+            msg = (Message) inFromClient.readObject();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        String username = msg.getMsg();
 
-        // Reply with acknowledgement and notify rest of clients
+        // Reply with acknowledgement and
+        msg.setMsg("Username received, thank you " + username);
+        try {
+            outToClient.writeObject(msg);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
+        // notify rest of clients - help
+        msg.setMsg(username + " has joined!");
+
+        // Loop:
         // Wait and receive message from client
+        try {
+            msg = (Message) inFromClient.readObject();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
 
         // Append client username to beginning of message and forward to other clients
 
-        // Loop
+        // Receive sign off message from client
+        try {
+            msg = (Message) inFromClient.readObject();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
 
-        // Receive sign of message from client
+        // Reply with sign off
+        msg.setMsg("Goodbye!");
+        try {
+            outToClient.writeObject(msg);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-        // Reply with sign off acknowledgement
 
+        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // below this point is copy pasted and not yet edited
+        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  /*       try {
             is = new BufferedReader(new InputStreamReader(s.getInputStream()));
             os = new PrintWriter(s.getOutputStream());

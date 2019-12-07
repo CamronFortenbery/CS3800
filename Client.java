@@ -29,67 +29,46 @@ public class Client {
         outToServer.writeObject(msg);
 
         // Receive acknowledgement from server
+        // Should probably add some sort of verification here
         msg = (Message) inFromServer.readObject();
-
+        System.out.println(msg.getMsg());
 
         // Ask user to enter message to send to other clients
+        System.out.println("You can now send messages to other clients!");
 
-        // Send message every time user hits 'enter'
+        String reply;
+        while (true) {
+            // Loop:
+            // Send message every time user hits 'enter'
+            reply = scan.nextLine();
+            msg.setMsg(reply);
+            outToServer.writeObject(msg);
 
-        // Receive messages from server and display to user
+            // Receive messages from server and display to user
+            // Not sure how to poll this, help
+            // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            msg = (Message) inFromServer.readObject();
+            System.out.println(msg);
+            // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-        // If user enters '.' begin exit procedure
+            // If user enters '.' begin exit procedure
+            if (msg.getMsg().equals("."))
+                break;
+        }
 
         // Exit:
         // Send sign off message to server
+        msg.setMsg("SIGN_OFF");
+        outToServer.writeObject(msg);
 
         // Leave group
+        // Idk what this means besides disconnect from server
 
         // Wait for confirmation from server
+        msg = (Message) inFromServer.readObject();
+        // add verification here?
 
-
-        // Copy pasted stuff, havent touched it
-        InetAddress address = InetAddress.getLocalHost();
-        Socket s1 = null;
-        String line = null;
-        BufferedReader br = null;
-        BufferedReader is = null;
-        PrintWriter os = null;
-
-        try {
-            s1 = new Socket(address, 5000);
-            br = new BufferedReader(new InputStreamReader(System.in));
-            is = new BufferedReader(new InputStreamReader(s1.getInputStream()));
-            os = new PrintWriter(s1.getOutputStream());
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.err.print("IO Exception");
-        }
-
-        System.out.println("You can now start sending messages to server!");
-
-        String response = null;
-        try {
-            line = br.readLine();
-            while (line.compareTo("QUIT") != 0) {
-                os.println(line);
-                os.flush();
-                response = is.readLine();
-                System.out.println("Response from Server : " + response);
-                line = br.readLine();
-
-            }
-
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-
-            is.close();
-            os.close();
-            br.close();
-            s1.close();
-        }
-
+        clientSocket.close();
+        scan.close();
     }
 }
