@@ -26,9 +26,11 @@ public class Server implements Runnable {
         ServerSocket welcomeSocket = new ServerSocket(PORT_NUMBER);
 
         // Accept connection and spawn thread
-        Server server = new Server(welcomeSocket.accept());
-        Thread chatThread = new Thread(server);
-        chatThread.start();
+        while(true) {
+            Server server = new Server(welcomeSocket.accept());
+            Thread chatThread = new Thread(server);
+            chatThread.start();
+        }
 
     }
 
