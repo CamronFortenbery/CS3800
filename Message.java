@@ -6,6 +6,8 @@ public class Message implements Serializable {
     private String msg = null;
 
     // Might need to implement message type
+    public int SIGN_OFF = 1;
+    public int CHAT = 2;
 
     //getters
     public String getMsg() {
