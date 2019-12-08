@@ -10,21 +10,10 @@ public class Server {
     // port 48620-49150 is unassigned range
     static final int PORT_NUMBER = 48620;
 
-/*
-    public Server(Socket connectionSocket) throws IOException {
-        this.connectionSocket = connectionSocket;
-        this.outToClient = new ObjectOutputStream(this.connectionSocket.getOutputStream());
-        this.inFromClient = new ObjectInputStream(this.connectionSocket.getInputStream());
-        System.out.println("Server initiated");
-
-    }
-*/
-
+    // ArrayList for keeping track of clients
+    static ArrayList<ClientHandler> clientList = new ArrayList<>();
 
     public static void main(String[] args) throws IOException {
-
-        // ArrayList for keeping track of clients
-        ArrayList<ClientHandler> clientList = new ArrayList<>();
 
         // index for clients
         int i = 0;
@@ -104,6 +93,7 @@ class ClientHandler implements Runnable {
             e.printStackTrace();
         }
         String username = msg.getMsg();
+        this.setUsername(username);
 
         // Reply with acknowledgement and
         msg.setMsg("Username received, thank you " + username);
@@ -124,7 +114,21 @@ class ClientHandler implements Runnable {
             e.printStackTrace();
         }
 
-        // Append client username to beginning of message and forward to other clients
+        // Append username to message
+        msg.setMsg(username + ": " + msg.getMsg());
+
+        // Send message to other clients
+        for (ClientHandler client : Server.clientList
+        ) {
+            // if statement SHOULD keep server from bouncing message back to sending client
+            if(client.getUsername().equals(this.getUsername()))
+                continue;
+            try {
+                client.outToClient.writeObject(msg);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
 
         // Receive sign off message from client
         try {
