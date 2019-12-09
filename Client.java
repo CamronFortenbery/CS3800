@@ -1,3 +1,5 @@
+package client;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -21,12 +23,7 @@ public class Client
         session.setClient(this);
         session.start();
         msg = new Message();
-        try {
-            output = new ObjectOutputStream(clientSocket.getOutputStream());
-            input = new ObjectInputStream(clientSocket.getInputStream());
-        }catch (IOException e) {
-            System.out.println("Output or input stream error!");
-        }
+        
         
         
     }
@@ -44,6 +41,12 @@ public class Client
             clientSocket = new Socket("localhost", 48620);
         } catch (IOException e) {
             System.out.println("Invalid Host!");
+        }
+        try {
+            output = new ObjectOutputStream(clientSocket.getOutputStream());
+            input = new ObjectInputStream(clientSocket.getInputStream());
+        }catch (IOException e) {
+            System.out.println("Output or input stream error!");
         }
 
     }
@@ -69,6 +72,7 @@ public class Client
         //session.displayMessage(hostname, messageToDisplay);  
 
     	String newString = String.valueOf(messageToDisplay);
+        session.displayMessage(newString);
 
     }
     
@@ -84,6 +88,7 @@ public class Client
 
     public static void main(String[] args)
     {
-        
+        Client client = new Client();
+        client.start();
     }
 }
