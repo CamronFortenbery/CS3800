@@ -1,6 +1,4 @@
 
-package chatgui;
-
 import java.awt.*;
 import java.awt.event.ActionEvent;
 
