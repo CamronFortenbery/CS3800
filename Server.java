@@ -5,7 +5,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 
-
 public class Server {
 
     // port 48620-49150 is unassigned range
@@ -21,6 +20,7 @@ public class Server {
 
         // Initialize welcome socket
         ServerSocket welcomeSocket = new ServerSocket(PORT_NUMBER);
+        System.out.println("Server initiated");
         Socket connectionSocket;
 
         // Repeatedly accept new connections
@@ -78,10 +78,11 @@ class ClientHandler implements Runnable {
 
         // Send welcome message
         Message msg = new Message();
-        msg.setMsg("Welcome!");
+        msg.setMsg("Welcome! Please enter your username");
         msg.setMsgType(Message.SIGN_IN);
 
         try {
+            // Message 0
             outToClient.writeObject(msg);
         } catch (IOException e) {
             e.printStackTrace();
@@ -89,6 +90,7 @@ class ClientHandler implements Runnable {
 
         // Receive username
         try {
+            // Message 1
             msg = (Message) inFromClient.readObject();
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
@@ -101,6 +103,7 @@ class ClientHandler implements Runnable {
         // Reply with acknowledgement and
         msg.setMsg("Username received, thank you " + username);
         try {
+            // Message 2
             outToClient.writeObject(msg);
         } catch (IOException e) {
             e.printStackTrace();

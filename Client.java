@@ -19,18 +19,26 @@ public class Client {
         ObjectOutputStream outToServer = new ObjectOutputStream(clientSocket.getOutputStream());
         ObjectInputStream inFromServer = new ObjectInputStream(clientSocket.getInputStream());
 
-        // Prompt user to enter username
+        // Instantiate message obj
+        Message msg = new Message();
+
+        // Instantiate Scanner
         Scanner scan = new Scanner(System.in);
-        System.out.println("Please enter a username");
+
+        // Receive welcome message
+        // Message 0
+        msg = (Message) inFromServer.readObject();
+        System.out.println(msg);
         String username = scan.nextLine();
 
         // Send username to server
-        Message msg = new Message();
         msg.setMsg(username);
+        // Message 1
         outToServer.writeObject(msg);
 
         // Receive acknowledgement from server
         // Should probably add some sort of verification here
+        // Message 2
         msg = (Message) inFromServer.readObject();
         System.out.println(msg.getMsg());
 
