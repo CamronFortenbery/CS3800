@@ -130,6 +130,8 @@ class ClientHandler implements Runnable {
             } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
             }
+            // Test statement
+            System.out.println(msg.getMsg());
 
             // If server receives sign off message
             if (msg.getMsgType() == Message.SIGN_OFF) {

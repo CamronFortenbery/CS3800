@@ -56,6 +56,15 @@ public class Client
                 Message incomingMsg = new Message();
 
                 while (true) {
+                    // Receive message
+                    try {
+                        incomingMsg = (Message) input.readObject();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (ClassNotFoundException e) {
+                        e.printStackTrace();
+                    }
+
                     // Interrupt current thread if receive SIGN_OFF from server
                     if (incomingMsg.getMsgType() == Message.SIGN_OFF)
                         Thread.currentThread().interrupt();
@@ -77,6 +86,8 @@ public class Client
         outgoingMsg.setMsg(messageToSend);
         try {
             output.writeObject(outgoingMsg);
+            output.flush();
+            output.reset();
         } catch (Exception e) {
             System.out.println("Problem sending message!!");
         }
@@ -89,8 +100,8 @@ public class Client
         //Input code here to change from Message to String
         //session.displayMessage(hostname, messageToDisplay);  
 
-    	String newString = String.valueOf(messageToDisplay);
-        session.displayMessage(newString);
+        System.out.println(messageToDisplay.getMsg());
+        session.displayMessage(messageToDisplay.getMsg());
 
     }
     
