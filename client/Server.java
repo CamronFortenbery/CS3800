@@ -1,3 +1,5 @@
+package client;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -117,19 +119,7 @@ class ClientHandler implements Runnable {
         msg.setMsg(username + " has joined!");
         msg.setMsgType(Message.CHAT);
 
-        for (ClientHandler client : Server.clientList
-        ) {
-            // if statement SHOULD keep server from bouncing message back to sending client
-            if (client.getUsername().equals(this.getUsername()))
-                continue;
-            try {
-                client.outToClient.writeObject(msg);
-                client.outToClient.flush();
-                client.outToClient.reset();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+        sendMessage(msg);
 
         // Loop:
         while (true) {
@@ -158,19 +148,7 @@ class ClientHandler implements Runnable {
 
                 // Tell other users
                 msg.setMsg(this.username + " has signed off");
-                for (ClientHandler client : Server.clientList
-                ) {
-                    // if statement SHOULD keep server from bouncing message back to sending client
-                    if (client.getUsername().equals(this.getUsername()))
-                        continue;
-                    try {
-                        client.outToClient.writeObject(msg);
-                        client.outToClient.flush();
-                        client.outToClient.reset();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
+                sendMessage(msg);
 
                 // Exit loop
                 break;
@@ -180,19 +158,7 @@ class ClientHandler implements Runnable {
             msg.setMsg(username + ": " + msg.getMsg());
 
             // Send message to other clients
-            for (ClientHandler client : Server.clientList
-            ) {
-                // if statement SHOULD keep server from bouncing message back to sending client
-                if (client.getUsername().equals(this.getUsername()))
-                    continue;
-                try {
-                    client.outToClient.writeObject(msg);
-                    client.outToClient.flush();
-                    client.outToClient.reset();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+            sendMessage(msg);
         }
         // End of loop
 
@@ -205,5 +171,21 @@ class ClientHandler implements Runnable {
             e.printStackTrace();
         }
 
+    }
+
+    private void sendMessage(Message msg) {
+        for (ClientHandler client : Server.clientList
+        ) {
+            // if statement SHOULD keep server from bouncing message back to sending client
+//            if (client.getUsername().equals(this.getUsername()))
+//                continue;
+            try {
+                client.outToClient.writeObject(msg);
+                client.outToClient.flush();
+                client.outToClient.reset();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
