@@ -64,7 +64,7 @@ public class Client
                     }
 
                     // Test print
-                    System.out.println(incomingMsg.getMsg());
+                    // System.out.println(incomingMsg.getMsg());
 
                     // Interrupt current thread if receive SIGN_OFF from server
                     if (incomingMsg.getMsgType() == Message.SIGN_OFF)
@@ -102,7 +102,7 @@ public class Client
         //Input code here to change from Message to String
         //session.displayMessage(hostname, messageToDisplay);  
 
-        System.out.println(messageToDisplay.getMsg());
+        // System.out.println(messageToDisplay.getMsg());
         session.displayMessage(messageToDisplay.getMsg());
 
     }

@@ -11,6 +11,7 @@ public class Message implements Serializable {
     public static final int SIGN_OFF = 1;
     public static final int CHAT = 2;
     public static final int SIGN_IN = 3;
+    public static final int USERNAME = 4;
 
     //getters
     public String getMsg() {

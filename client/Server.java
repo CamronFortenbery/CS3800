@@ -80,8 +80,8 @@ class ClientHandler implements Runnable {
 
         // Send welcome message
         Message msg = new Message();
-        msg.setMsg("Welcome! Please enter your username");
-        msg.setMsgType(Message.SIGN_IN);
+        msg.setMsg("Welcome!");
+        // msg.setMsgType(Message.SIGN_IN);
 
         try {
             // Send message 0
@@ -92,6 +92,7 @@ class ClientHandler implements Runnable {
             e.printStackTrace();
         }
 
+        /*
         // Receive username
         try {
             // Receive Message 1
@@ -104,6 +105,10 @@ class ClientHandler implements Runnable {
         String username = msg.getMsg();
         this.setUsername(username);
 
+        /*
+         */
+
+        /*
         // Reply with acknowledgement and
         msg.setMsg("Username received, thank you " + username);
         try {
@@ -114,6 +119,8 @@ class ClientHandler implements Runnable {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        */
+
 
         // notify rest of clients
         msg.setMsg(username + " has joined!");
@@ -131,7 +138,7 @@ class ClientHandler implements Runnable {
                 e.printStackTrace();
             }
             // Test statement
-            System.out.println(msg.getMsg());
+            // System.out.println(msg.getMsg());
 
             // If server receives sign off message
             if (msg.getMsgType() == Message.SIGN_OFF) {
@@ -157,7 +164,8 @@ class ClientHandler implements Runnable {
             }
 
             // Append username to message
-            msg.setMsg(username + ": " + msg.getMsg());
+            // Commenting out, i think the GUI handles this
+            // msg.setMsg(username + ": " + msg.getMsg());
 
             // Send message to other clients
             sendMessage(msg);
@@ -181,7 +189,7 @@ class ClientHandler implements Runnable {
             // if statement SHOULD keep server from bouncing message back to sending client
 //            if (client.getUsername().equals(this.getUsername()))
 //                continue;
-            System.out.println("sendMessage: " + msg.getMsg());
+            // System.out.println("sendMessage: " + msg.getMsg());
             try {
                 client.outToClient.writeObject(msg);
                 client.outToClient.flush();
