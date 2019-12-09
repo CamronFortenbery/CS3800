@@ -26,19 +26,21 @@ public class Client {
         Scanner scan = new Scanner(System.in);
 
         // Receive welcome message
-        // Message 0
+        // Receive Message 0
         msg = (Message) inFromServer.readObject();
-        System.out.println(msg);
+        System.out.println(msg.getMsg());
         String username = scan.nextLine();
 
         // Send username to server
         msg.setMsg(username);
-        // Message 1
+        // Send Message 1
         outToServer.writeObject(msg);
+        outToServer.flush();
+        outToServer.reset();
 
         // Receive acknowledgement from server
         // Should probably add some sort of verification here
-        // Message 2
+        // Receive Message 2
         msg = (Message) inFromServer.readObject();
         System.out.println(msg.getMsg());
 
@@ -67,6 +69,8 @@ public class Client {
                     // Send message to server
                     try {
                         outToServer.writeObject(outgoingMsg);
+                        outToServer.flush();
+                        outToServer.reset();
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -112,6 +116,8 @@ public class Client {
         msg.setMsg("SIGN_OFF");
         msg.setMsgType(Message.SIGN_OFF);
         outToServer.writeObject(msg);
+        outToServer.flush();
+        outToServer.reset();
 
         // Leave group
         // Accomplished by clientHandler in Server.java

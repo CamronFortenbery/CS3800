@@ -82,15 +82,17 @@ class ClientHandler implements Runnable {
         msg.setMsgType(Message.SIGN_IN);
 
         try {
-            // Message 0
+            // Send message 0
             outToClient.writeObject(msg);
+            outToClient.flush();
+            outToClient.reset();
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         // Receive username
         try {
-            // Message 1
+            // Receive Message 1
             msg = (Message) inFromClient.readObject();
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
@@ -103,8 +105,10 @@ class ClientHandler implements Runnable {
         // Reply with acknowledgement and
         msg.setMsg("Username received, thank you " + username);
         try {
-            // Message 2
+            // Send Message 2
             outToClient.writeObject(msg);
+            outToClient.flush();
+            outToClient.reset();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -120,6 +124,8 @@ class ClientHandler implements Runnable {
                 continue;
             try {
                 client.outToClient.writeObject(msg);
+                client.outToClient.flush();
+                client.outToClient.reset();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -144,6 +150,8 @@ class ClientHandler implements Runnable {
                 msg.setMsg("Goodbye!");
                 try {
                     outToClient.writeObject(msg);
+                    outToClient.flush();
+                    outToClient.reset();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -157,6 +165,8 @@ class ClientHandler implements Runnable {
                         continue;
                     try {
                         client.outToClient.writeObject(msg);
+                        client.outToClient.flush();
+                        client.outToClient.reset();
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -177,6 +187,8 @@ class ClientHandler implements Runnable {
                     continue;
                 try {
                     client.outToClient.writeObject(msg);
+                    client.outToClient.flush();
+                    client.outToClient.reset();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
