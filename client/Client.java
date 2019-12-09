@@ -49,6 +49,9 @@ public class Client
             System.out.println("Output or input stream error!");
         }
 
+        // Send username to server
+        sendMessage(hostname);
+
         Thread readMessage = new Thread(new Runnable() {
             @Override
             public void run() {

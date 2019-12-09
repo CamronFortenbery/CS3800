@@ -121,6 +121,14 @@ class ClientHandler implements Runnable {
         }
         */
 
+        // Receive username
+        try {
+            msg = (Message) inFromClient.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        username = msg.getMsg();
 
         // notify rest of clients
         msg.setMsg(username + " has joined!");
