@@ -4,10 +4,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.Scanner;
 
-public class Client 
-{
+public class Client {
     ChatGUI session;
     ObjectInputStream input;
     ObjectOutputStream output;
@@ -16,26 +14,20 @@ public class Client
     Message msg;
     final int PORT_NUMBER = 48620;
     final String HOSTNAME = "localhost";
-    
-    public void start()
-    {
+
+    public void start() {
         session = new ChatGUI();
         session.setClient(this);
         session.start();
         msg = new Message();
-        
-        
-        
     }
-    
-    public void setHostname(String newHostName)
-    {
+
+    public void setHostname(String newHostName) {
         hostname = newHostName;
         setupConnection();
     }
-    
-    public void setupConnection()
-    {
+
+    public void setupConnection() {
         //Do what you need to set up the connection to the server
         try {
             clientSocket = new Socket("localhost", 48620);
@@ -45,7 +37,7 @@ public class Client
         try {
             output = new ObjectOutputStream(clientSocket.getOutputStream());
             input = new ObjectInputStream(clientSocket.getInputStream());
-        }catch (IOException e) {
+        } catch (IOException e) {
             System.out.println("Output or input stream error!");
         }
 
@@ -66,9 +58,6 @@ public class Client
                         e.printStackTrace();
                     }
 
-                    // Test print
-                    // System.out.println(incomingMsg.getMsg());
-
                     // Interrupt current thread if receive SIGN_OFF from server
                     if (incomingMsg.getMsgType() == Message.SIGN_OFF)
                         Thread.currentThread().interrupt();
@@ -82,13 +71,18 @@ public class Client
         });
         readMessage.start();
     }
-    
-    public void sendMessage(String messageToSend)
-    {
+
+    public void sendMessage(String messageToSend) {
         //input code to turn String into message and send it to server
         Message outgoingMsg = new Message();
-        outgoingMsg.setMsgType(Message.CHAT);
-        outgoingMsg.setMsg(messageToSend);
+
+        // Check for exit
+        if (messageToSend.equals("<" + hostname + "> " + ".")) {
+            outgoingMsg.setMsgType(Message.SIGN_OFF);
+        } else {
+            outgoingMsg.setMsgType(Message.CHAT);
+            outgoingMsg.setMsg(messageToSend);
+        }
         try {
             output.writeObject(outgoingMsg);
             output.flush();
@@ -96,32 +90,23 @@ public class Client
         } catch (Exception e) {
             System.out.println("Problem sending message!!");
         }
-        
+
 
     }
-    
-    public void getMessage(Message messageToDisplay)
-    {
+
+    public void getMessage(Message messageToDisplay) {
         //Input code here to change from Message to String
-        //session.displayMessage(hostname, messageToDisplay);  
-
-        // System.out.println(messageToDisplay.getMsg());
         session.displayMessage(messageToDisplay.getMsg());
+    }
+
+    public void updateUserList(Message newUser) {
+        //Input code here to change from Message to String
+        //session.addNewUser(newUser);
 
     }
-    
-    public void updateUserList(Message newUser)
-    {
-       //Input code here to change from Message to String
-       //session.addNewUser(newUser);
 
-    }
-    
-    
-    
 
-    public static void main(String[] args)
-    {
+    public static void main(String[] args) {
         Client client = new Client();
         client.start();
     }

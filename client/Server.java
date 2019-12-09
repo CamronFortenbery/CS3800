@@ -92,35 +92,6 @@ class ClientHandler implements Runnable {
             e.printStackTrace();
         }
 
-        /*
-        // Receive username
-        try {
-            // Receive Message 1
-            msg = (Message) inFromClient.readObject();
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        // Set username
-        String username = msg.getMsg();
-        this.setUsername(username);
-
-        /*
-         */
-
-        /*
-        // Reply with acknowledgement and
-        msg.setMsg("Username received, thank you " + username);
-        try {
-            // Send Message 2
-            outToClient.writeObject(msg);
-            outToClient.flush();
-            outToClient.reset();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        */
-
         // Receive username
         try {
             msg = (Message) inFromClient.readObject();
@@ -145,8 +116,6 @@ class ClientHandler implements Runnable {
             } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
             }
-            // Test statement
-            // System.out.println(msg.getMsg());
 
             // If server receives sign off message
             if (msg.getMsgType() == Message.SIGN_OFF) {
@@ -155,6 +124,7 @@ class ClientHandler implements Runnable {
 
                 // Reply with sign off message
                 msg.setMsg("Goodbye!");
+                msg.setMsgType(Message.SIGN_OFF);
                 try {
                     outToClient.writeObject(msg);
                     outToClient.flush();
@@ -170,11 +140,6 @@ class ClientHandler implements Runnable {
                 // Exit loop
                 break;
             }
-
-            // Append username to message
-            // Commenting out, i think the GUI handles this
-            // msg.setMsg(username + ": " + msg.getMsg());
-
             // Send message to other clients
             sendMessage(msg);
         }
@@ -194,10 +159,6 @@ class ClientHandler implements Runnable {
     private void sendMessage(Message msg) {
         for (ClientHandler client : Server.clientList
         ) {
-            // if statement SHOULD keep server from bouncing message back to sending client
-//            if (client.getUsername().equals(this.getUsername()))
-//                continue;
-            // System.out.println("sendMessage: " + msg.getMsg());
             try {
                 client.outToClient.writeObject(msg);
                 client.outToClient.flush();
