@@ -181,6 +181,7 @@ class ClientHandler implements Runnable {
             // if statement SHOULD keep server from bouncing message back to sending client
 //            if (client.getUsername().equals(this.getUsername()))
 //                continue;
+            System.out.println("sendMessage: " + msg.getMsg());
             try {
                 client.outToClient.writeObject(msg);
                 client.outToClient.flush();

@@ -59,11 +59,12 @@ public class Client
                     // Receive message
                     try {
                         incomingMsg = (Message) input.readObject();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    } catch (ClassNotFoundException e) {
+                    } catch (IOException | ClassNotFoundException e) {
                         e.printStackTrace();
                     }
+
+                    // Test print
+                    System.out.println(incomingMsg.getMsg());
 
                     // Interrupt current thread if receive SIGN_OFF from server
                     if (incomingMsg.getMsgType() == Message.SIGN_OFF)
@@ -76,6 +77,7 @@ public class Client
 
             }
         });
+        readMessage.start();
     }
     
     public void sendMessage(String messageToSend)
