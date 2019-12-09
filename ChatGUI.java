@@ -1,3 +1,4 @@
+package client;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -13,6 +14,7 @@ public class ChatGUI
     ArrayList users = new ArrayList();
     JTextArea chatArea;
     JTextArea userDisplayArea;
+    Client client;
         
     //Call this after creating a GUI for a client. The main method is only used
     //when this class isn't hooked up to the client network. This method sets 
@@ -102,6 +104,7 @@ public class ChatGUI
                     //Change this to send the currentUser to the server
                     //and then have the server call the changeUserList method
                     users.add(currentUser);
+                    client.setHostname(currentUser);
                     
                     
                     //This window becomes invisible and the chat window will be
@@ -167,7 +170,7 @@ public class ChatGUI
         chatWindow.setVisible(true);
         
         displayUsers();
-        displayMessage("SYSTEM_MESSAGE" , "YOU HAVE ENTERED THE CHAT ROOM");
+        displayMessage("<SYSTEM_MESSAGE> YOU HAVE ENTERED THE CHAT ROOM");
         
         messageInput.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), "enter"); 
         messageInput.getActionMap().put("enter", new AbstractAction() 
@@ -179,7 +182,8 @@ public class ChatGUI
                 //the message to the server, along with our currentUsername.
                 //Then have the server call displayMessage() of all clients,
                 //while sending them the message that it recieved.
-                displayMessage(currentUser, messageInput.getText());
+                //displayMessage(currentUser, messageInput.getText());
+                sendMessage(currentUser, messageInput.getText());
                 
                 
                 //Keep this After the changes listed above, don't call it from
@@ -192,10 +196,15 @@ public class ChatGUI
         });
     }
     
-    //Displays the input String onto the screen
-    public void displayMessage(String user, String message)
+    public void sendMessage(String user, String message)
     {
-        chatArea.append("<" + user + "> " + message + "\n");
+      String messageToSend =("<" + user + "> " + message);
+      client.sendMessage(messageToSend);
+    }
+    //Displays the input String onto the screen
+    public void displayMessage(String message)
+    {
+        chatArea.append(message + "\n");
     }
     
     //Displays the current version of the User List on the userDisplayArea
@@ -225,12 +234,8 @@ public class ChatGUI
         displayUsers();
     }
     
-    //Delete this once the Server/Client classes are set up to call it correctly
-    //Remembet to call the start() method in the client after creating a ChatGUI
-    //Object.
-    public static void main(String[] args)
+    public void setClient(Client newClient)
     {
-        ChatGUI test = new ChatGUI();
-        test.start();
+        this.client = newClient;
     }
 }
