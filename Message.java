@@ -5,9 +5,10 @@ public class Message implements Serializable {
     private int msgType = -1;
     private String msg = null;
 
-    // Might need to implement message type
-    public int SIGN_OFF = 1;
-    public int CHAT = 2;
+    // Message types
+    public static final int SIGN_OFF = 1;
+    public static final int CHAT = 2;
+    public static final int SIGN_IN = 3;
 
     //getters
     public String getMsg() {

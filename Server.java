@@ -1,8 +1,9 @@
-import java.io.*;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Scanner;
 
 
 public class Server {
@@ -51,7 +52,6 @@ public class Server {
 
 class ClientHandler implements Runnable {
 
-    Scanner scan = new Scanner(System.in);
     private String username;
     final ObjectOutputStream outToClient;
     final ObjectInputStream inFromClient;
@@ -79,6 +79,7 @@ class ClientHandler implements Runnable {
         // Send welcome message
         Message msg = new Message();
         msg.setMsg("Welcome!");
+        msg.setMsgType(Message.SIGN_IN);
 
         try {
             outToClient.writeObject(msg);
@@ -92,6 +93,8 @@ class ClientHandler implements Runnable {
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
+
+        // Set username
         String username = msg.getMsg();
         this.setUsername(username);
 
@@ -103,25 +106,14 @@ class ClientHandler implements Runnable {
             e.printStackTrace();
         }
 
-        // notify rest of clients - help
+        // notify rest of clients
         msg.setMsg(username + " has joined!");
+        msg.setMsgType(Message.CHAT);
 
-        // Loop:
-        // Wait and receive message from client
-        try {
-            msg = (Message) inFromClient.readObject();
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        // Append username to message
-        msg.setMsg(username + ": " + msg.getMsg());
-
-        // Send message to other clients
         for (ClientHandler client : Server.clientList
         ) {
             // if statement SHOULD keep server from bouncing message back to sending client
-            if(client.getUsername().equals(this.getUsername()))
+            if (client.getUsername().equals(this.getUsername()))
                 continue;
             try {
                 client.outToClient.writeObject(msg);
@@ -130,21 +122,73 @@ class ClientHandler implements Runnable {
             }
         }
 
-        // Receive sign off message from client
-        try {
-            msg = (Message) inFromClient.readObject();
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+        // Loop:
+        while (true) {
 
-        // Reply with sign off
-        msg.setMsg("Goodbye!");
+            // Wait and receive message from client
+            try {
+                msg = (Message) inFromClient.readObject();
+            } catch (IOException | ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+
+            // If server receives sign off message
+            if (msg.getMsgType() == Message.SIGN_OFF) {
+                // Remove client from list
+                Server.clientList.remove(this);
+
+                // Reply with sign off message
+                msg.setMsg("Goodbye!");
+                try {
+                    outToClient.writeObject(msg);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                // Tell other users
+                msg.setMsg(this.username + " has signed off");
+                for (ClientHandler client : Server.clientList
+                ) {
+                    // if statement SHOULD keep server from bouncing message back to sending client
+                    if (client.getUsername().equals(this.getUsername()))
+                        continue;
+                    try {
+                        client.outToClient.writeObject(msg);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                // Exit loop
+                break;
+            }
+
+            // Append username to message
+            msg.setMsg(username + ": " + msg.getMsg());
+
+            // Send message to other clients
+            for (ClientHandler client : Server.clientList
+            ) {
+                // if statement SHOULD keep server from bouncing message back to sending client
+                if (client.getUsername().equals(this.getUsername()))
+                    continue;
+                try {
+                    client.outToClient.writeObject(msg);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        // End of loop
+
+        // Close resources
         try {
-            outToClient.writeObject(msg);
+            this.outToClient.close();
+            this.inFromClient.close();
+            this.connectionSocket.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
-
 
     }
 }

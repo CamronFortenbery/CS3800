@@ -1,11 +1,12 @@
-import java.io.*;
-import java.net.InetAddress;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.Scanner;
 
 public class Client {
 
-    public static void main(String args[]) throws IOException, ClassNotFoundException {
+    public static void main(String[] args) throws IOException, ClassNotFoundException {
 
         final int PORT_NUMBER = 48620;
         final String HOSTNAME = "localhost";
@@ -36,38 +37,85 @@ public class Client {
         // Ask user to enter message to send to other clients
         System.out.println("You can now send messages to other clients!");
 
-        String reply;
-        while (true) {
-            // Loop:
-            // Send message every time user hits 'enter'
-            reply = scan.nextLine();
-            msg.setMsg(reply);
-            outToServer.writeObject(msg);
+        // sendMessage thread
+        Thread sendMessage = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                // Create and set message object
+                Message outgoingMsg = new Message();
+                outgoingMsg.setMsgType(Message.CHAT);
 
-            // Receive messages from server and display to user
-            // Not sure how to poll this, help
-            // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            msg = (Message) inFromServer.readObject();
-            System.out.println(msg);
-            // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                while (true) {
+                    // Receive message from user
+                    outgoingMsg.setMsg(scan.nextLine());
 
-            // If user enters '.' begin exit procedure
-            if (msg.getMsg().equals("."))
-                break;
-        }
+                    // Check for quit
+                    if (outgoingMsg.getMsg().equals(".")) {
+                        // Exit threads and start sign off procedure
+                        Thread.currentThread().interrupt();
+
+                    }
+
+                    // Send message to server
+                    try {
+                        outToServer.writeObject(outgoingMsg);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            }
+        });
+
+
+        // readMessage thread
+        Thread readMessage = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                // Create and set message object
+                Message incomingMsg = new Message();
+                incomingMsg.setMsgType(Message.CHAT);
+
+                while (true) {
+                    // Interrupt current thread if sendMessage thread is interrupted
+                    if (sendMessage.isInterrupted())
+                        Thread.currentThread().interrupt();
+
+                    // Read message from server
+                    try {
+                        incomingMsg = (Message) inFromServer.readObject();
+                    } catch (IOException | ClassNotFoundException e) {
+                        e.printStackTrace();
+                    }
+
+                    // Display to user
+                    System.out.println(incomingMsg.getMsg());
+                }
+
+            }
+        });
+
+        // Start threads
+        sendMessage.start();
+        readMessage.start();
 
         // Exit:
         // Send sign off message to server
         msg.setMsg("SIGN_OFF");
+        msg.setMsgType(Message.SIGN_OFF);
         outToServer.writeObject(msg);
 
         // Leave group
-        // Idk what this means besides disconnect from server
+        // Accomplished by clientHandler in Server.java
 
         // Wait for confirmation from server
         msg = (Message) inFromServer.readObject();
+        System.out.println(msg.getMsg());
         // add verification here?
 
+        // Close resources
+        inFromServer.close();
+        outToServer.close();
         clientSocket.close();
         scan.close();
     }
